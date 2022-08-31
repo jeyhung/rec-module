@@ -1,0 +1,21 @@
+version: "3.8"
+services:
+  mongo:
+    image: mongo:4.4
+    container_name: mongo
+    hostname: mongo
+    restart: unless-stopped
+    ports:
+      - 27017:27017
+
+  restful:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: rec-module
+    container_name: rec-module
+    restart: on-failure
+    depends_on:
+      - mongo
+    ports:
+      - 8080:8080

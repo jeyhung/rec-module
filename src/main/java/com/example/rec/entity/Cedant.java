@@ -17,12 +17,12 @@ import java.time.LocalDateTime;
 public class Cedant {
     @Id
     private String id;
-    private String countryId;
-    private String currencyId;
-    private String groupCedantId;
+    private String countriesId;
+    private String currenciesId;
+    private String groupCedantsId;
     private String regionId;
-    private String reinsuranceId;
-    private String typeCedantId;
+    private String reinsurancesId;
+    private String typesCedantsId;
     private int benefitPercentage;
     private String code;
     private String color1;

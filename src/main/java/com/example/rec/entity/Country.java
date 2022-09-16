@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public class Country {
     @Id
     private String id;
-    private String regionId;
+    private String regionsId;
     private String code;
     private String name;
     private LocalDateTime createdAt;

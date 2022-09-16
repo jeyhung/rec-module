@@ -1,7 +1,7 @@
 package com.example.rec.config;
 
-import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -11,14 +11,15 @@ import springfox.documentation.service.*;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import java.util.Arrays;
 import java.util.List;
 
-@Configuration
-@EnableSwagger2
-public class SwaggerConfig {
+import static com.example.rec.shared.Constants.*;
 
+@Configuration
+@ConditionalOnProperty(value = "springfox.documentation.enabled", havingValue = "true", matchIfMissing = true)
+public class SwaggerConfig {
     private final String contactName;
     private final String contactUrl;
     private final String contactEmail;
@@ -26,12 +27,12 @@ public class SwaggerConfig {
     private final String projectDescription;
     private final String projectVersion;
 
-    public SwaggerConfig(@Value("${spring.contact.name}") String contactName,
-                         @Value("${spring.contact.url}") String contactUrl,
-                         @Value("${spring.contact.email}") String contactEmail,
-                         @Value("${spring.project.title}") String projectTitle,
-                         @Value("${spring.project.description}") String projectDescription,
-                         @Value("${spring.project.version}") String projectVersion) {
+    public SwaggerConfig(@Value("${swagger.contact.name}") String contactName,
+                         @Value("${swagger.contact.email}") String contactEmail,
+                         @Value("${swagger.contact.url}") String contactUrl,
+                         @Value("${swagger.project.title}") String projectTitle,
+                         @Value("${swagger.project.description}") String projectDescription,
+                         @Value("${swagger.project.version}") String projectVersion) {
         this.contactName = contactName;
         this.contactUrl = contactUrl;
         this.contactEmail = contactEmail;
@@ -42,10 +43,11 @@ public class SwaggerConfig {
 
     @Bean
     public Docket api() {
-        return new Docket(DocumentationType.SWAGGER_2)
+        return new Docket(DocumentationType.OAS_30)
                 .apiInfo(getApiInfo())
                 .forCodeGeneration(true)
-                .securityContexts(Lists.newArrayList(securityContext()))
+                .securityContexts(Arrays.asList(securityContext()))
+                .securitySchemes(Arrays.asList(jwt()))
                 .select()
                 .apis(RequestHandlerSelectors.any())
                 .paths(PathSelectors.any())
@@ -53,14 +55,16 @@ public class SwaggerConfig {
     }
 
     private ApiInfo getApiInfo() {
-        Contact contact = new Contact(contactName, contactUrl, contactEmail);
-
         return new ApiInfoBuilder()
                 .title(projectTitle)
                 .description(projectDescription)
                 .version(projectVersion)
-                .contact(contact)
+                .contact(new Contact(contactName, contactUrl, contactEmail))
                 .build();
+    }
+
+    private ApiKey jwt() {
+        return new ApiKey(JWT_KEY, AUTHORIZATION, HEADER);
     }
 
     private SecurityContext securityContext() {
@@ -73,6 +77,6 @@ public class SwaggerConfig {
         AuthorizationScope authorizationScope = new AuthorizationScope("global", null);
         AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
         authorizationScopes[0] = authorizationScope;
-        return Lists.newArrayList(new SecurityReference("JWT", authorizationScopes));
+        return Arrays.asList(new SecurityReference("JWT", authorizationScopes));
     }
 }

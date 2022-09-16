@@ -1,6 +1,5 @@
 package com.example.rec.entity;
 
-import com.example.rec.constant.BranchType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,11 +18,12 @@ import java.util.List;
 public class Branch {
     @Id
     private String id;
-    private String parentId;
+    private String parentBranchId;
+    private int isParent;
     private String code;
     private String name;
     private int status;
-    private BranchType type;
+    private String type;
     private List<String> alias;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
